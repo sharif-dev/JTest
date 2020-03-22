@@ -1,0 +1,19 @@
+1. Create a team in Sharif-dev
+2. Create a repository in Sharif-dev
+3. Add a team in setting> manage access of mentioned repository
+4. Creating a project in android studio
+5. go to folder of that project and run following commands:
+git init
+git add .
+git commit -m"t"
+git config --global user.email "atieh.atieh.jamshidpoor@gmail.com"
+git config --global user.name "mahsirat-atiye"
+git commit -m"t"
+git remote add origin https://github.com/sharif-dev/JTest.git
+git remote set-url origin https://github.com/sharif-dev/JTest.git
+git push -u origin master
+git fetch origin master
+git merge origin master
+git push -u origin master
+git push origin master --force
+
