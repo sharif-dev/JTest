@@ -1,0 +1,2 @@
+rootProject.name='My Jingil Climate Predictor'
+include ':app'
