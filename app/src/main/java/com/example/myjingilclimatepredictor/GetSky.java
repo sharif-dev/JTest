@@ -13,76 +13,78 @@ import com.google.gson.Gson;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.List;
 
-public class GetMap extends Thread {
-    final static String MAPBOX_TAG = "MAPBOX_TAG";
+public class GetSky extends Thread {
+    final static String SKY_TAG = "SKY_TAG";
 
-    private String query;
+    private String latitude;
+    private String longitude;
     private Context context;
-    private List<Feature> cities;
+    private ArrayList<Datum__> days;
     private RequestQueue queue;
-    private final String accessToken = "pk.eyJ1IjoibWFoc2lyYXQiLCJhIjoiY2s4NTR6bXBuMDI5YjNmc2p3dDh4NzM5YyJ9.kLU-vp3fVkOtvvBjZtGFaQ";
+    private final String secretKey = "3d056b7d74d0cad0d331a596046a868f";
 
     public RequestQueue getQueue() {
         return queue;
     }
 
     static class Builder {
-        String query;
-        Context context;
-        List<Feature>cities;
+        String latitude;
+        String longitude;
 
-        Builder withQuery(String query) {
-            this.query = query;
+        Context context;
+        ArrayList<Datum__> days = new ArrayList<>();
+
+
+        GetSky.Builder withLatitudeAndLongitude(String latitude, String longitude) {
+            this.latitude = latitude;
+            this.longitude = longitude;
             return this;
         }
 
-        Builder withContext(Context context) {
+        GetSky.Builder withContext(Context context) {
             this.context = context;
             return this;
         }
 
-        Builder withCites(List<Feature> cities) {
-            this.cities = cities;
+        GetSky.Builder withDays(ArrayList<Datum__> days) {
+            this.days = days;
             return this;
         }
 
 
-
-
-        GetMap build() {
-            return new GetMap(query, context, cities);
+        GetSky build() {
+            return new GetSky(latitude, longitude, context, days);
         }
     }
 
-    private GetMap(String query, Context context, List<Feature>cities) {
-        this.query = query;
+    private GetSky(String latitude, String longitude, Context context, ArrayList<Datum__> days) {
+        this.latitude = latitude;
+        this.longitude = longitude;
         this.context = context;
-        this.cities = cities;
+        this.days = days;
     }
 
     @Override
     public void run() {
         queue = Volley.newRequestQueue(context);
-        String url = "https://api.mapbox.com/geocoding/v5/mapbox.places/" + query + ".json?access_token=" + accessToken;
+        String url = "https://api.darksky.net/forecast/"+secretKey+"/"+latitude+","+longitude;
 
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        Log.d(MAPBOX_TAG, "Get Response: "+response);
+                        Log.d(SKY_TAG, "Get Response");
                         try {
                             Gson gson = new Gson();
 
-                            Map map = gson.fromJson(response, Map.class);
-                            cities.clear();
-                            for (Feature city : map.features
+                            Sky sky = gson.fromJson(response, Sky.class);
+                            days.clear();
+                            for (Datum__ day: sky.daily.data
                             ) {
-                                Log.d(MAPBOX_TAG, city.placeName);
-                                Log.d(MAPBOX_TAG, "latitude: "+city.center.get(0).toString());
-                                Log.d(MAPBOX_TAG, "longitude: "+city.center.get(1).toString());
-                                cities.add(city);
+                                Log.d(SKY_TAG, day.summary);
+                                days.add(day);
+
 
                             }
 
@@ -90,6 +92,7 @@ public class GetMap extends Thread {
 
                         } catch (Exception e) {
 //                            showError(R.string.mapbox_error);
+                            Log.d(SKY_TAG, e.getStackTrace().toString());
                         }
 
                     }
@@ -120,10 +123,10 @@ public class GetMap extends Thread {
                             break;
                     }
                     String responseBody = new String(error.networkResponse.data, "utf-8");
-                    Log.d(MAPBOX_TAG, "error is: " + responseBody);
+                    Log.d(SKY_TAG, "error is: " + responseBody);
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
-                    Log.d(MAPBOX_TAG, error.toString());
+                    Log.d(SKY_TAG, error.toString());
 
                 }
 
@@ -132,8 +135,6 @@ public class GetMap extends Thread {
 
         queue.add(stringRequest);
     }
-
-
 
 
 }
