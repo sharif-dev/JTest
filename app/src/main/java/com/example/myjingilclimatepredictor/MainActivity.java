@@ -7,11 +7,18 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ProgressBar;
+
 import java.util.ArrayList;
 import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {
+
+
+
 
     final static String TAG = "SKY_TAG";
     GetMap getMap;
@@ -24,9 +31,6 @@ public class MainActivity extends AppCompatActivity {
 
         searchForCity("tehran", new ArrayList<Feature>());
         searchForClimate("37.8267", "-122.4233", new ArrayList<Datum__>());
-
-
-
 
     }
     @Override
@@ -45,8 +49,6 @@ public class MainActivity extends AppCompatActivity {
 
         }
     }
-
-
 
 
     private void searchForClimate(String latitude, String longitude, ArrayList<Datum__> days){
