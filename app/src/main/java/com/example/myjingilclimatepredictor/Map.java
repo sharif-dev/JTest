@@ -4,7 +4,7 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import java.util.List;
 
-class Context {
+class Context_ {
 
     @SerializedName("id")
     @Expose
@@ -54,7 +54,7 @@ class Feature {
     public Geometry geometry;
     @SerializedName("context")
     @Expose
-    public List<Context> context = null;
+    public List<Context_> context = null;
     @SerializedName("matching_text")
     @Expose
     public String matchingText;
