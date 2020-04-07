@@ -6,23 +6,50 @@ import android.net.ConnectivityManager;
 
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.FileUtils;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity<example> extends AppCompatActivity {
 
+    private static String example;
+    private static Alaki ex;
 
+    public static void write(String []args) {
+        try {
+            String str = ex.toString();
+            File newTextFile = new File("save.txt");
+
+            FileWriter fw = new FileWriter(newTextFile);
+            fw.write(str);
+            fw.close();
+
+        } catch (IOException iox) {
+
+            iox.printStackTrace();
+        }
+    }
 
 
     final static String TAG = "SKY_TAG";
     GetMap getMap;
     GetSky getSky;
+
+    public MainActivity() throws FileNotFoundException {
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
