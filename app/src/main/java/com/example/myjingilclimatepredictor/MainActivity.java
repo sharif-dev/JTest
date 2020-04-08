@@ -18,6 +18,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -31,9 +32,11 @@ public class MainActivity extends AppCompatActivity {
 //    GetSky getSky;
     ArrayList<Feature> maplist;
 //    ArrayList<Datum__> skylist;
+    ProgressBar progressBar;
     Handler handler = new Handler(Looper.getMainLooper()){
         @Override
         public void handleMessage(@NonNull Message msg) {
+            progressBar.setVisibility(View.GONE);
             if (msg.what == 1){
                 UpdateCityListView(msg);
             }
@@ -81,20 +84,18 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, "no map open");
 
         }
-//        try {
-//            getSky.getQueue().cancelAll(TAG);
-//        }catch (Exception e){
-//            Log.d(TAG, "no sky open");
-//
-//        }
+
     }
 
     private void ConfigCitySearch() {
         final EditText citysearch = (EditText)findViewById(R.id.city_name);
         Button searchbutton = (Button) findViewById(R.id.button5);
+        progressBar = (ProgressBar)findViewById(R.id.progressBar3);
+        progressBar.setVisibility(View.GONE);
         searchbutton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                progressBar.setVisibility(View.VISIBLE);
                 if (citysearch.getText().toString().length() > 0){
                     maplist = new ArrayList<>();
                     Toast.makeText(MainActivity.this, citysearch.getText().toString(), Toast.LENGTH_LONG).show();
@@ -104,16 +105,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-//    private void searchForClimate(String latitude, String longitude, ArrayList<Datum__> days){
-//        GetSky.Builder builder = new GetSky.Builder();
-//        builder = builder.withLatitudeAndLongitude(latitude, longitude);
-//        builder = builder.withContext(getApplicationContext());
-//        builder = builder.withDays(days);
-//        builder = builder.withHandler(handler);
-//        getSky = builder.build();
-//        getSky.start();
-//
-//    }
+
     private void searchForCity(String searchedTerm, List<Feature>cities){
         GetMap.Builder builder = new GetMap.Builder();
         builder = builder.withQuery(searchedTerm);
