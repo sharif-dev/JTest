@@ -9,6 +9,8 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -16,11 +18,14 @@ import java.util.ArrayList;
 
 public class SecondActivity extends AppCompatActivity {
 
+    final static String TAG = "CLIMATE_TAG";
     GetSky getSky;
     ArrayList<Datum__> skylist;
+    ProgressBar progressBar;
     Handler handler = new Handler(Looper.getMainLooper()){
         @Override
         public void handleMessage(@NonNull Message msg) {
+            progressBar.setVisibility(View.GONE);
             if (msg.what == 1){
                 UpdateCityWeather(msg);
             }
@@ -62,6 +67,17 @@ public class SecondActivity extends AppCompatActivity {
         GetPassedMessage(intent);
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        try {
+            getSky.getQueue().cancelAll(TAG);
+        }catch (Exception e){
+            Log.d(TAG, "no sky open");
+
+        }
+    }
+
     private void GetPassedMessage(Intent intent) {
         String selectedcity = intent.getStringExtra("cityInfo");
         String[] citydetail = selectedcity.split("  ");
@@ -69,6 +85,8 @@ public class SecondActivity extends AppCompatActivity {
         String longitude = citydetail[citydetail.length - 1];
         Log.i("CITY_SELECTED", latitude + longitude);
         skylist = new ArrayList<>();
+        progressBar = (ProgressBar)findViewById(R.id.progressBar2);
+//        progressBar.setVisibility(View.VISIBLE);
         searchForClimate(latitude, longitude, skylist);
     }
 
