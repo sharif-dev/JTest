@@ -1,6 +1,9 @@
 package com.example.myjingilclimatepredictor;
 
 import android.content.Context;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 
 import com.android.volley.Request;
@@ -23,6 +26,8 @@ public class GetSky extends Thread {
     private ArrayList<Datum__> days;
     private RequestQueue queue;
     private final String secretKey = "3d056b7d74d0cad0d331a596046a868f";
+    private Handler handler;
+
 
     public RequestQueue getQueue() {
         return queue;
@@ -34,7 +39,7 @@ public class GetSky extends Thread {
 
         Context context;
         ArrayList<Datum__> days = new ArrayList<>();
-
+        Handler handler;
 
         GetSky.Builder withLatitudeAndLongitude(String latitude, String longitude) {
             this.latitude = latitude;
@@ -52,17 +57,23 @@ public class GetSky extends Thread {
             return this;
         }
 
+        GetSky.Builder withHandler(Handler handler){
+            this.handler = handler;
+            return this;
+        }
+
 
         GetSky build() {
-            return new GetSky(latitude, longitude, context, days);
+            return new GetSky(latitude, longitude, context, days, handler);
         }
     }
 
-    private GetSky(String latitude, String longitude, Context context, ArrayList<Datum__> days) {
+    private GetSky(String latitude, String longitude, Context context, ArrayList<Datum__> days, Handler handler) {
         this.latitude = latitude;
         this.longitude = longitude;
         this.context = context;
         this.days = days;
+        this.handler = handler;
     }
 
     @Override
@@ -101,27 +112,39 @@ public class GetSky extends Thread {
             public void onErrorResponse(VolleyError error) {
                 try {
                     int code = error.networkResponse.statusCode;
+                    Message message = new Message();
+                    Bundle messageBundle = new Bundle();
+                    messageBundle.putString("ErrorMsg", new String(error.networkResponse.data,"UTF-8"));
 //                    todo Sabrineh decide on proper error message for following senarios
-                    switch (code) {
-                        case 401:
-//                token error
-                            break;
-                        case 403:
-//                forbidden
-                            break;
-                        case 404:
-//                not found
-                            break;
-                        case 422:
-//                query length
-                            break;
-                        case 429:
-//                rate
-                            break;
-                        default:
-//                            in this case you have to send to handler
-                            break;
-                    }
+//                    switch (code) {
+//                        case 401:
+//                            messageBundle.putString("ErrorMsg", "Token Error");
+////                token error
+//                            break;
+//                        case 403:
+//                            messageBundle.putString("ErrorMsg", "Forbidden");
+////                forbidden
+//                            break;
+//                        case 404:
+//                            messageBundle.putString("ErrorMsg", "Not Found");
+////                not found
+//                            break;
+//                        case 422:
+//                            messageBundle.putString("ErrorMsg", "Query Length");
+////                query length
+//                            break;
+//                        case 429:
+//                            messageBundle.putString("ErrorMsg", "Rate");
+////                rate
+//                            break;
+//                        default:
+////                            in this case you have to send to handler
+//                            messageBundle.putString("ErrorMsg", "FADSFAS");
+//                            break;
+//                    }
+                    message.setData(messageBundle);
+                    message.what = 3;
+                    handler.sendMessage(message);
                     String responseBody = new String(error.networkResponse.data, "utf-8");
                     Log.d(SKY_TAG, "error is: " + responseBody);
                 } catch (UnsupportedEncodingException e) {
