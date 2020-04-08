@@ -1,36 +1,34 @@
 package com.example.myjingilclimatepredictor;
 
 public class Alaki {
+    private String id;
+    private String c;
 
-    char name;
-    int id;
+//    Alaki(int id, char c) {
+//        this.id = id;
+//        this.c = c;
+//    }
 
-    public Alaki(char name, int id) {
-        name = name;
-        id = id;
+    String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    String getC() {
+        return c;
+    }
+
+    public void setC(String c) {
+        this.c = c;
     }
 
     @Override
     public String toString() {
-        return "Alaki{" +
-                "name=" + name +
-                ", id=" + id +
+        return "id= " + id +
+                " , c= " + c +
                 '}';
-    }
-
-    public char getName() {
-        return name;
-    }
-
-    public void setName(char name) {
-        this.name = name;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 }
