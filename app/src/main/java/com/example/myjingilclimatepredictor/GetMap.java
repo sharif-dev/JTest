@@ -1,7 +1,13 @@
 package com.example.myjingilclimatepredictor;
 
 import android.content.Context;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -21,8 +27,10 @@ public class GetMap extends Thread {
     private String query;
     private Context context;
     private List<Feature> cities;
+    private ArrayList<String> string_city = new ArrayList<String>();
     private RequestQueue queue;
     private final String accessToken = "pk.eyJ1IjoibWFoc2lyYXQiLCJhIjoiY2s4NTR6bXBuMDI5YjNmc2p3dDh4NzM5YyJ9.kLU-vp3fVkOtvvBjZtGFaQ";
+    private Handler handler;
 
     public RequestQueue getQueue() {
         return queue;
@@ -32,6 +40,7 @@ public class GetMap extends Thread {
         String query;
         Context context;
         List<Feature>cities;
+        Handler handler;
 
         Builder withQuery(String query) {
             this.query = query;
@@ -48,18 +57,21 @@ public class GetMap extends Thread {
             return this;
         }
 
-
-
+        Builder withHandler(Handler handler){
+            this.handler = handler;
+            return this;
+        }
 
         GetMap build() {
-            return new GetMap(query, context, cities);
+            return new GetMap(query, context, cities, handler);
         }
     }
 
-    private GetMap(String query, Context context, List<Feature>cities) {
+    private GetMap(String query, Context context, List<Feature>cities, Handler handler) {
         this.query = query;
         this.context = context;
         this.cities = cities;
+        this.handler = handler;
     }
 
     @Override
@@ -75,7 +87,7 @@ public class GetMap extends Thread {
                         try {
                             Gson gson = new Gson();
 
-                            Map map = gson.fromJson(response, Map.class);
+                            final Map map = gson.fromJson(response, Map.class);
                             cities.clear();
                             for (Feature city : map.features
                             ) {
@@ -83,10 +95,25 @@ public class GetMap extends Thread {
                                 Log.d(MAPBOX_TAG, "latitude: "+city.center.get(0).toString());
                                 Log.d(MAPBOX_TAG, "longitude: "+city.center.get(1).toString());
                                 cities.add(city);
-
+                                string_city.add(city.placeName + "  " + city.center.get(0).toString() + "   " + city.center.get(1).toString());
                             }
 
 //                            todo::Sabrineh - send to UI
+                            Message message = new Message();
+                            Bundle messageBundle = new Bundle();
+                            messageBundle.putStringArrayList("CityMsg", string_city);
+                            message.setData(messageBundle);
+                            message.what = 1;
+                            handler.sendMessage(message);
+//                            mainActivity.handler.post(new Runnable() {
+//                                @Override
+//                                public void run() {
+//                                    ListView listView = (ListView)mainActivity.findViewById(R.id.list_view);
+//                                    listView.setAdapter(new ArrayAdapter<String>(mainActivity, android.R.layout.simple_list_item_1, string_city));
+//                                    TextView textView = (TextView)mainActivity.findViewById(R.id.textView);
+//                                    textView.setText(cities.get(0).placeName);
+//                                }
+//                            });
 
                         } catch (Exception e) {
 //                            showError(R.string.mapbox_error);
@@ -98,27 +125,38 @@ public class GetMap extends Thread {
             public void onErrorResponse(VolleyError error) {
                 try {
                     int code = error.networkResponse.statusCode;
+                    Message message = new Message();
+                    Bundle messageBundle = new Bundle();
+                    messageBundle.putString("ErrorMsg", new String(error.networkResponse.data,"UTF-8"));
 //                    todo Sabrineh decide on proper error message for following senarios
-                    switch (code) {
-                        case 401:
-//                token error
-                            break;
-                        case 403:
-//                forbidden
-                            break;
-                        case 404:
-//                not found
-                            break;
-                        case 422:
-//                query length
-                            break;
-                        case 429:
-//                rate
-                            break;
-                        default:
-//                            in this case you have to send to handler
-                            break;
-                    }
+//                    switch (code) {
+//                        case 401:
+//                            messageBundle.putString("ErrorMsg", "Token Error");
+////                token error
+//                            break;
+//                        case 403:
+//                            messageBundle.putString("ErrorMsg", "Forbidden");
+////                forbidden
+//                            break;
+//                        case 404:
+//                            messageBundle.putString("ErrorMsg", "Not Found");
+////                not found
+//                            break;
+//                        case 422:
+//                            messageBundle.putString("ErrorMsg", "Query Length");
+////                query length
+//                            break;
+//                        case 429:
+//                            messageBundle.putString("ErrorMsg", "Rate");
+////                rate
+//                            break;
+//                        default:
+////                            in this case you have to send to handler
+//                            break;
+//                    }
+                    message.setData(messageBundle);
+                    message.what = 2;
+                    handler.sendMessage(message);
                     String responseBody = new String(error.networkResponse.data, "utf-8");
                     Log.d(MAPBOX_TAG, "error is: " + responseBody);
                 } catch (UnsupportedEncodingException e) {
