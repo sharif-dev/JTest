@@ -98,7 +98,6 @@ public class GetMap extends Thread {
                                 string_city.add(city.placeName + "  " + city.center.get(0).toString() + "   " + city.center.get(1).toString());
                             }
 
-//                            todo::Sabrineh - send to UI
                             Message message = new Message();
                             Bundle messageBundle = new Bundle();
                             messageBundle.putStringArrayList("CityMsg", string_city);
@@ -125,39 +124,15 @@ public class GetMap extends Thread {
             public void onErrorResponse(VolleyError error) {
                 try {
                     int code = error.networkResponse.statusCode;
+
                     Message message = new Message();
                     Bundle messageBundle = new Bundle();
                     messageBundle.putString("ErrorMsg", new String(error.networkResponse.data,"UTF-8"));
-//                    todo Sabrineh decide on proper error message for following senarios
-//                    switch (code) {
-//                        case 401:
-//                            messageBundle.putString("ErrorMsg", "Token Error");
-////                token error
-//                            break;
-//                        case 403:
-//                            messageBundle.putString("ErrorMsg", "Forbidden");
-////                forbidden
-//                            break;
-//                        case 404:
-//                            messageBundle.putString("ErrorMsg", "Not Found");
-////                not found
-//                            break;
-//                        case 422:
-//                            messageBundle.putString("ErrorMsg", "Query Length");
-////                query length
-//                            break;
-//                        case 429:
-//                            messageBundle.putString("ErrorMsg", "Rate");
-////                rate
-//                            break;
-//                        default:
-////                            in this case you have to send to handler
-//                            break;
-//                    }
                     message.setData(messageBundle);
                     message.what = 2;
                     handler.sendMessage(message);
                     String responseBody = new String(error.networkResponse.data, "utf-8");
+
                     Log.d(MAPBOX_TAG, "error is: " + responseBody);
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();

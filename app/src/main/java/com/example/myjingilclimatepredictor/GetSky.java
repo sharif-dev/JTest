@@ -24,6 +24,7 @@ public class GetSky extends Thread {
     private String longitude;
     private Context context;
     private ArrayList<Datum__> days;
+    private ArrayList<String> cityinfo = new ArrayList<String>();
     private RequestQueue queue;
     private final String secretKey = "3d056b7d74d0cad0d331a596046a868f";
     private Handler handler;
@@ -80,7 +81,6 @@ public class GetSky extends Thread {
     public void run() {
         queue = Volley.newRequestQueue(context);
         String url = "https://api.darksky.net/forecast/"+secretKey+"/"+latitude+","+longitude;
-
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @Override
@@ -95,15 +95,20 @@ public class GetSky extends Thread {
                             ) {
                                 Log.d(SKY_TAG, day.summary);
                                 days.add(day);
-
+                                cityinfo.add(day.summary);
 
                             }
 
-//                            todo::Sabrineh - send to UI
+                            Message message = new Message();
+                            Bundle messageBundle = new Bundle();
+                            messageBundle.putStringArrayList("cityinfo", cityinfo);
+                            message.setData(messageBundle);
+                            message.what = 1;
+                            handler.sendMessage(message);
 
                         } catch (Exception e) {
 //                            showError(R.string.mapbox_error);
-                            Log.d(SKY_TAG, e.getStackTrace().toString());
+                            Log.d(SKY_TAG, e.getMessage());
                         }
 
                     }
@@ -112,40 +117,15 @@ public class GetSky extends Thread {
             public void onErrorResponse(VolleyError error) {
                 try {
                     int code = error.networkResponse.statusCode;
+
                     Message message = new Message();
                     Bundle messageBundle = new Bundle();
                     messageBundle.putString("ErrorMsg", new String(error.networkResponse.data,"UTF-8"));
-//                    todo Sabrineh decide on proper error message for following senarios
-//                    switch (code) {
-//                        case 401:
-//                            messageBundle.putString("ErrorMsg", "Token Error");
-////                token error
-//                            break;
-//                        case 403:
-//                            messageBundle.putString("ErrorMsg", "Forbidden");
-////                forbidden
-//                            break;
-//                        case 404:
-//                            messageBundle.putString("ErrorMsg", "Not Found");
-////                not found
-//                            break;
-//                        case 422:
-//                            messageBundle.putString("ErrorMsg", "Query Length");
-////                query length
-//                            break;
-//                        case 429:
-//                            messageBundle.putString("ErrorMsg", "Rate");
-////                rate
-//                            break;
-//                        default:
-////                            in this case you have to send to handler
-//                            messageBundle.putString("ErrorMsg", "FADSFAS");
-//                            break;
-//                    }
                     message.setData(messageBundle);
-                    message.what = 3;
+                    message.what = 2;
                     handler.sendMessage(message);
                     String responseBody = new String(error.networkResponse.data, "utf-8");
+
                     Log.d(SKY_TAG, "error is: " + responseBody);
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
