@@ -29,9 +29,9 @@ public class MainActivity extends AppCompatActivity {
 
     final static String TAG = "SKY_TAG";
     GetMap getMap;
-//    GetSky getSky;
+    //    GetSky getSky;
     ArrayList<Feature> maplist;
-//    ArrayList<Datum__> skylist;
+    //    ArrayList<Datum__> skylist;
     ProgressBar progressBar;
     Handler handler = new Handler(Looper.getMainLooper()){
         @Override
