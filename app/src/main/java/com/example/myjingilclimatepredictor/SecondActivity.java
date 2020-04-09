@@ -3,6 +3,7 @@ package com.example.myjingilclimatepredictor;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -14,6 +15,16 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 
 public class SecondActivity extends AppCompatActivity {
@@ -22,6 +33,7 @@ public class SecondActivity extends AppCompatActivity {
     GetSky getSky;
     ArrayList<Datum__> skylist;
     ProgressBar progressBar;
+    ArrayList<String> savedskylist;
     Handler handler = new Handler(Looper.getMainLooper()){
         @Override
         public void handleMessage(@NonNull Message msg) {
@@ -64,17 +76,83 @@ public class SecondActivity extends AppCompatActivity {
         setContentView(R.layout.activity_second);
 
         Intent intent = getIntent();
-        GetPassedMessage(intent);
+        if (intent.getStringExtra("cityInfo") != null && intent.getStringExtra("cityInfo").equals("NOT_CONNECTED")){
+            ReadFromFile();
+        }
+        else {
+            GetPassedMessage(intent);
+        }
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+        WriteTOFile();
         try {
             getSky.getQueue().cancelAll(TAG);
         }catch (Exception e){
             Log.d(TAG, "no sky open");
 
+        }
+    }
+
+    private void ReadFromFile() {
+        String line = null;
+        try {
+            File file = new File(SecondActivity.this.getFilesDir(), "text");
+            File mfile = new File(file, "sample");
+            FileInputStream fileInputStream = new FileInputStream (mfile);
+            InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream);
+            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+            savedskylist = new ArrayList<>();
+            while ( (line = bufferedReader.readLine()) != null )
+            {
+                savedskylist.add(line);
+            }
+            fileInputStream.close();
+            bufferedReader.close();
+        }
+        catch(FileNotFoundException ex) {
+            Log.d(TAG, ex.getMessage());
+        }
+        catch(IOException ex) {
+            Log.d(TAG, ex.getMessage());
+        }
+
+        TextView view0 = (TextView)findViewById(R.id.textView2);
+        view0.setText(savedskylist.get(0));
+
+        TextView view1 = (TextView)findViewById(R.id.textView);
+        view1.setText(savedskylist.get(1));
+
+        TextView view2 = (TextView)findViewById(R.id.textView3);
+        view2.setText(savedskylist.get(2));
+
+        TextView view3 = (TextView)findViewById(R.id.textView5);
+        view3.setText(savedskylist.get(3));
+
+        TextView view4 = (TextView)findViewById(R.id.textView6);
+        view4.setText(savedskylist.get(4));
+
+    }
+
+    private void WriteTOFile() {
+        File file = new File(SecondActivity.this.getFilesDir(), "text");
+        if (!file.exists()){
+            file.mkdir();
+        }
+        File mfile = new File(file, "sample");
+        FileWriter writer = null;
+        try {
+            writer = new FileWriter(mfile);
+            writer.write("");
+            for (int i = 0; i < skylist.size(); i++) {
+                writer.append(skylist.get(i).summary + "\n");
+            }
+            writer.flush();
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

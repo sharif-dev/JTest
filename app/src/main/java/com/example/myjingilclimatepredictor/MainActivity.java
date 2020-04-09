@@ -89,7 +89,9 @@ public class MainActivity extends AppCompatActivity {
 
         if (!isConnected){
             Toast.makeText(MainActivity.this, "No connection!", Toast.LENGTH_LONG).show();
-//            todo forward to next activity with proper extra part
+            Intent intent = new Intent(MainActivity.this, SecondActivity.class);
+            intent.putExtra("cityInfo", "NOT_CONNECTED");
+            startActivity(intent);
         }
 
         UpdateCityListView();
