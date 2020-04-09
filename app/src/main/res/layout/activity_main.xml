@@ -24,19 +24,29 @@
 
     <Button
         android:id="@+id/button5"
-        android:layout_width="143dp"
+
+        android:textColor="#BDB4A6"
+        android:textSize="22sp"
+
+        android:layout_width="140dp"
         android:layout_height="60dp"
-        android:layout_marginTop="36dp"
-        android:background="#E91E63"
+        android:background="@drawable/buttonshape"
+        android:shadowColor="#A8A8A8"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:shadowRadius="5"
+
         android:text="@string/Search"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@+id/city_name"
         app:layout_constraintTop_toTopOf="parent" />
 
+
+
     <ListView
         android:id="@+id/list_view"
-        android:layout_width="428dp"
+        android:layout_width="match_parent"
         android:layout_height="574dp"
         android:layout_marginTop="48dp"
         android:focusableInTouchMode="false"

@@ -3,6 +3,7 @@ package com.example.myjingilclimatepredictor;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 
@@ -79,6 +80,18 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ConnectivityManager cm =
+                (ConnectivityManager)MainActivity.this.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting();
+
+        if (!isConnected){
+            Toast.makeText(MainActivity.this, "No connection!", Toast.LENGTH_LONG).show();
+//            todo forward to next activity with proper extra part
+        }
+
         UpdateCityListView();
         ConfigCitySearch();
 //        searchForClimate("51.407", "35.7117", new ArrayList<Datum__>());
