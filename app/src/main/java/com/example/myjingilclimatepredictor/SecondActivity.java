@@ -1,9 +1,11 @@
 package com.example.myjingilclimatepredictor;
 
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.media.Image;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -40,22 +42,49 @@ public class SecondActivity extends AppCompatActivity {
     }
 
 
+    public String felan(String a){
+
+        if (a.contains("cloudy")){
+            return "@android:mipmap/cloudy.jpg";
+        } else if (a.contains("haily")){
+            return "@android:mipmap/haily.jpg";
+        } else if (a.contains("heavy_rainy")) {
+            return "@android:mipmap/heavy_rainy.jpg";
+        }  else if (a.contains("light_cloudy")) {
+            return "@android:mipmap/light_cloudy.jpg";
+        }  else if (a.contains("lightning")) {
+            return "@android:mipmap/lightning.jpg";
+        }  else if (a.contains("not_heavy_raining")) {
+            return "@android:mipmap/not_heavy_raining.jpg";
+        }  else if (a.contains("rainy")) {
+            return "@android:mipmap/rainy.jpg";
+        }  else if (a.contains("snowy")) {
+            return "@android:mipmap/snowy.jpg";
+        }  else if (a.contains("sunny")) {
+            return "@android:mipmap/sunny.jpg";
+        }
+    }
+
     public void UpdateCityWeather(Message msg){
         TextView view0 = (TextView)findViewById(R.id.textView2);
         view0.setText(msg.getData().getStringArrayList("cityinfo").get(0));
+        felan(msg.getData().getStringArrayList("cityinfo").get(0));
 
         TextView view1 = (TextView)findViewById(R.id.textView);
         view1.setText(msg.getData().getStringArrayList("cityinfo").get(1));
+        felan(msg.getData().getStringArrayList("cityinfo").get(1));
 
         TextView view2 = (TextView)findViewById(R.id.textView3);
         view2.setText(msg.getData().getStringArrayList("cityinfo").get(2));
+        felan(msg.getData().getStringArrayList("cityinfo").get(2));
 
         TextView view3 = (TextView)findViewById(R.id.textView5);
         view3.setText(msg.getData().getStringArrayList("cityinfo").get(3));
+        felan(msg.getData().getStringArrayList("cityinfo").get(3));
 
         TextView view4 = (TextView)findViewById(R.id.textView6);
         view4.setText(msg.getData().getStringArrayList("cityinfo").get(4));
-
+        felan(msg.getData().getStringArrayList("cityinfo").get(4));
     }
 
     @Override
