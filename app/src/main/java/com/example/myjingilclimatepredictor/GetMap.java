@@ -31,7 +31,6 @@ public class GetMap extends Thread {
     private RequestQueue queue;
     private final String accessToken = "pk.eyJ1IjoibWFoc2lyYXQiLCJhIjoiY2s4NTR6bXBuMDI5YjNmc2p3dDh4NzM5YyJ9.kLU-vp3fVkOtvvBjZtGFaQ";
     private Handler handler;
-    private ThumbnailAdapter adapter;
 
     public RequestQueue getQueue() {
         return queue;
@@ -42,7 +41,6 @@ public class GetMap extends Thread {
         Context context;
         List<Feature>cities;
         Handler handler;
-        ThumbnailAdapter adapter;
 
         Builder withQuery(String query) {
             this.query = query;
@@ -64,23 +62,16 @@ public class GetMap extends Thread {
             return this;
         }
 
-         Builder withAdapter(ThumbnailAdapter adapter) {
-            this.adapter = adapter;
-            return this;
-        }
         GetMap build() {
-            return new GetMap(query, context, cities, handler,adapter);
+            return new GetMap(query, context, cities, handler);
         }
-
-
     }
 
-    private GetMap(String query, Context context, List<Feature> cities, Handler handler, ThumbnailAdapter adapter) {
+    private GetMap(String query, Context context, List<Feature>cities, Handler handler) {
         this.query = query;
         this.context = context;
         this.cities = cities;
         this.handler = handler;
-        this.adapter = adapter;
     }
 
     @Override
@@ -107,24 +98,12 @@ public class GetMap extends Thread {
                                 string_city.add(city.placeName + "  " + city.center.get(0).toString() + "   " + city.center.get(1).toString());
                             }
 
-
-                            handler.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    adapter.notifyDataSetChanged();
-                                }
-                            });
-
-//                            Message message = new Message();
-//                            Bundle messageBundle = new Bundle();
-//                            messageBundle.putStringArrayList("CityMsg", string_city);
-//                            message.setData(messageBundle);
-//                            message.what = 1;
-//                            handler.sendMessage(message);
-
-
-
-
+                            Message message = new Message();
+                            Bundle messageBundle = new Bundle();
+                            messageBundle.putStringArrayList("CityMsg", string_city);
+                            message.setData(messageBundle);
+                            message.what = 1;
+                            handler.sendMessage(message);
 //                            mainActivity.handler.post(new Runnable() {
 //                                @Override
 //                                public void run() {
@@ -146,12 +125,12 @@ public class GetMap extends Thread {
                 try {
                     int code = error.networkResponse.statusCode;
 
-//                    Message message = new Message();
-//                    Bundle messageBundle = new Bundle();
-//                    messageBundle.putString("ErrorMsg", new String(error.networkResponse.data,"UTF-8"));
-//                    message.setData(messageBundle);
-//                    message.what = 2;
-//                    handler.sendMessage(message);
+                    Message message = new Message();
+                    Bundle messageBundle = new Bundle();
+                    messageBundle.putString("ErrorMsg", new String(error.networkResponse.data,"UTF-8"));
+                    message.setData(messageBundle);
+                    message.what = 2;
+                    handler.sendMessage(message);
                     String responseBody = new String(error.networkResponse.data, "utf-8");
 
                     Log.d(MAPBOX_TAG, "error is: " + responseBody);

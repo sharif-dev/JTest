@@ -74,7 +74,7 @@
 
         android:textColor="#040404"
 
-        android:textSize="25dip"
+        android:textSize="22sp"
 
         android:textStyle="bold"
         android:gravity="center"
@@ -101,5 +101,5 @@
 
         android:textColor="#343434"
 
-        android:textSize="15dip" />
+        android:textSize="5sp" />
 </RelativeLayout>

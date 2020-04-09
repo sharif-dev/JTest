@@ -11,7 +11,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.os.Parcelable;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -32,17 +31,17 @@ public class MainActivity extends AppCompatActivity {
     GetMap getMap;
     //    GetSky getSky;
     ArrayList<Feature> maplist = new ArrayList<>();
-
     //    ArrayList<Datum__> skylist;
     ProgressBar progressBar;
-    Handler mainHandler = new Handler();
     ThumbnailAdapter adapter;
     Handler handler = new Handler(Looper.getMainLooper()){
         @Override
         public void handleMessage(@NonNull Message msg) {
             progressBar.setVisibility(View.GONE);
             if (msg.what == 1){
-                UpdateCityListView(msg);
+//                UpdateCityListView(msg);
+                adapter.notifyDataSetChanged();
+
             }
             else if (msg.what == 2){
                 ToastError(msg);
@@ -57,43 +56,30 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(MainActivity.this, msg.getData().getString("ErrorMsg"), Toast.LENGTH_LONG).show();
     }
 
-    private void UpdateCityListView(Message msg) {
+    private void UpdateCityListView() {
         ListView listView = (ListView)findViewById(R.id.list_view);
-//        listView.setAdapter(new ArrayAdapter<String>(MainActivity.this,
-//                android.R.layout.simple_list_item_1,
-//                msg.getData().getStringArrayList("CityMsg")));
+//        listView.setAdapter(new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, msg.getData().getStringArrayList("CityMsg")));
         adapter = new ThumbnailAdapter(MainActivity.this,R.layout.list_row,maplist);
-
         listView.setAdapter(adapter);
-                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String selectedcity = (String) parent.getItemAtPosition(position);
+                Feature city = (Feature) parent.getItemAtPosition(position);
                 Intent nextactivity = new Intent(MainActivity.this, SecondActivity.class);
-                nextactivity.putExtra("cityInfo", selectedcity);
+                String selectedcity_=city.placeName + "  " + city.center.get(0).toString() + "   " + city.center.get(1).toString();
+                nextactivity.putExtra("cityInfo", selectedcity_);
                 startActivity(nextactivity);
             }
         });
     }
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        ListView listView = (ListView)findViewById(R.id.list_view);
-        adapter = new ThumbnailAdapter(MainActivity.this,R.layout.list_row,maplist);
-
-        listView.setAdapter(adapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Feature selectedcity = (Feature) parent.getItemAtPosition(position);
-                Intent nextactivity = new Intent(MainActivity.this, SecondActivity.class);
-                startActivity(nextactivity);
-            }
-        });
-
+        UpdateCityListView();
         ConfigCitySearch();
 //        searchForClimate("51.407", "35.7117", new ArrayList<Datum__>());
     }
@@ -120,6 +106,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 progressBar.setVisibility(View.VISIBLE);
                 if (citysearch.getText().toString().length() > 0){
+//                    maplist = new ArrayList<>();
                     Toast.makeText(MainActivity.this, citysearch.getText().toString(), Toast.LENGTH_LONG).show();
                     searchForCity(citysearch.getText().toString(), maplist);
                 }
@@ -133,9 +120,7 @@ public class MainActivity extends AppCompatActivity {
         builder = builder.withQuery(searchedTerm);
         builder = builder.withContext(getApplicationContext());
         builder = builder.withCites(cities);
-//        builder = builder.withHandler(handler);
-        builder = builder.withHandler(mainHandler);
-        builder = builder.withAdapter(adapter);
+        builder = builder.withHandler(handler);
         getMap = builder.build();
         getMap.start();
 
