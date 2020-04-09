@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -30,9 +31,12 @@ public class MainActivity extends AppCompatActivity {
     final static String TAG = "SKY_TAG";
     GetMap getMap;
     //    GetSky getSky;
-    ArrayList<Feature> maplist;
+    ArrayList<Feature> maplist = new ArrayList<>();
+
     //    ArrayList<Datum__> skylist;
     ProgressBar progressBar;
+    Handler mainHandler = new Handler();
+    ThumbnailAdapter adapter;
     Handler handler = new Handler(Looper.getMainLooper()){
         @Override
         public void handleMessage(@NonNull Message msg) {
@@ -55,8 +59,13 @@ public class MainActivity extends AppCompatActivity {
 
     private void UpdateCityListView(Message msg) {
         ListView listView = (ListView)findViewById(R.id.list_view);
-        listView.setAdapter(new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, msg.getData().getStringArrayList("CityMsg")));
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//        listView.setAdapter(new ArrayAdapter<String>(MainActivity.this,
+//                android.R.layout.simple_list_item_1,
+//                msg.getData().getStringArrayList("CityMsg")));
+        adapter = new ThumbnailAdapter(MainActivity.this,R.layout.list_row,maplist);
+
+        listView.setAdapter(adapter);
+                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String selectedcity = (String) parent.getItemAtPosition(position);
@@ -71,6 +80,20 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        ListView listView = (ListView)findViewById(R.id.list_view);
+        adapter = new ThumbnailAdapter(MainActivity.this,R.layout.list_row,maplist);
+
+        listView.setAdapter(adapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Feature selectedcity = (Feature) parent.getItemAtPosition(position);
+                Intent nextactivity = new Intent(MainActivity.this, SecondActivity.class);
+                startActivity(nextactivity);
+            }
+        });
+
         ConfigCitySearch();
 //        searchForClimate("51.407", "35.7117", new ArrayList<Datum__>());
     }
@@ -97,7 +120,6 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 progressBar.setVisibility(View.VISIBLE);
                 if (citysearch.getText().toString().length() > 0){
-                    maplist = new ArrayList<>();
                     Toast.makeText(MainActivity.this, citysearch.getText().toString(), Toast.LENGTH_LONG).show();
                     searchForCity(citysearch.getText().toString(), maplist);
                 }
@@ -111,7 +133,9 @@ public class MainActivity extends AppCompatActivity {
         builder = builder.withQuery(searchedTerm);
         builder = builder.withContext(getApplicationContext());
         builder = builder.withCites(cities);
-        builder = builder.withHandler(handler);
+//        builder = builder.withHandler(handler);
+        builder = builder.withHandler(mainHandler);
+        builder = builder.withAdapter(adapter);
         getMap = builder.build();
         getMap.start();
 
